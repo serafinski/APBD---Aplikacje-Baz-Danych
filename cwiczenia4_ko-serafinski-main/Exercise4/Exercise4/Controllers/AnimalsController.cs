@@ -77,7 +77,7 @@ namespace Exercise4.Controllers
             return Created($"/api/animals/{newAnimal.ID}", newAnimal);
         }
 
-        [HttpPut]
+        [HttpPut({"id:int"})]
         public async Task<IActionResult> UpdateAnimal(string id, UpdateAnimal animal)
         {
             if (await _animalRepository.Update(id,animal))
@@ -88,7 +88,7 @@ namespace Exercise4.Controllers
             return NotFound();
         }
 
-        [HttpDelete]
+        [HttpDelete ({"id:int"})]
         public async Task<IActionResult> DeleteAnimal(string id)
         {
             if (await _animalRepository.Delete(id))

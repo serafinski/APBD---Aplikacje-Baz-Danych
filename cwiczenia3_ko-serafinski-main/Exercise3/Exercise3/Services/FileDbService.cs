@@ -75,19 +75,19 @@ namespace Exercise3.Services
                     //KOLUMNY PRZEZ KTÓRE OPISYWANY JEST STUDENT TO: nazwisko
                     LastName = splitted[1],
                     //Nazwa studiów
-                    StudyName = splitted[2],
+                    StudyName = splitted[4],
                     //Nazwa trybu studiów
-                    StudyMode = splitted[3],
+                    StudyMode = splitted[5],
                     //KOLUMNY PRZEZ KTÓRE OPISYWANY JEST STUDENT TO: nrindeksu
-                    IndexNumber = "s" + splitted[4],
+                    IndexNumber = "s" + splitted[2],
                     //KOLUMNY PRZEZ KTÓRE OPISYWANY JEST STUDENT TO: data
-                    BirthDate = DateTime.Parse(splitted[5]).ToString(CultureInfo.CurrentCulture),
+                    BirthDate = DateTime.Parse(splitted[3]).ToString(CultureInfo.CurrentCulture),
                     //KOLUMNY PRZEZ KTÓRE OPISYWANY JEST STUDENT TO: email
                     Email = splitted[6],
                     //KOLUMNY PRZEZ KTÓRE OPISYWANY JEST STUDENT TO: ImieMatki
-                    MothersName = splitted[7],
+                    MothersName = splitted[8],
                     //KOLUMNY PRZEZ KTÓRE OPISYWANY JEST STUDENT TO: ImieOjca
-                    FathersName = splitted[8]
+                    FathersName = splitted[7]
                 };
     
                 //Musimy zadbać o to, aby nie dodawać do wyniku dwa razy studenta o tym samym imieniu, nazwisku i numerze indeksu.
