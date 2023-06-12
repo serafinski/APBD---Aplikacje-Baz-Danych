@@ -1,0 +1,26 @@
+﻿@*KOMPONENT! - część strony która będzie nam się wyświetlała*@
+
+@*Kompontent może być oznaczony jako @page*@
+@page "/counter"
+
+@*Tytuł strony*@
+<PageTitle>Counter</PageTitle>
+
+@*Reszta strony... *@
+<h1>Counter</h1>
+
+@*Odwołanie do wstrzykniętego kodu*@
+<p role="status">Current count: @currentCount</p>
+
+<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+
+@* @ = wstrzykiwanie kodu C# w HTML*@
+@code {
+    private int currentCount = 0;
+
+    private void IncrementCount()
+    {
+        currentCount++;
+    }
+
+}

@@ -1,0 +1,62 @@
+﻿@page "/studenci/{Id:int}"
+@using Exercise11.Data
+@inject IStudentService StudentService
+@inject NavigationManager NavigationManager
+
+<PageTitle>Student's Details</PageTitle>
+
+<h1>Student's Details</h1>
+
+
+@*Sprawdzenie czy elementy zostały załadowane - jak nie to... *@
+@if (_student is null)
+{
+    /*... wyświetlamy informacje o ładowaniu - jako że robimy lokalnie to nigdy tego nie dostaniemy!*/
+    <div>Student ID don't exist :(</div>
+} else
+{
+    /*W tabelce mogą być tylko określone konstrukcje - bo inaczej nam się posypie!*/
+    <table>
+        <tr>
+            <td>First name: </td>
+            <td><input value="@_student.FirstName" disabled /></td>
+            <td>Avatar: <input value="@_student.AvatarUrl" disabled/></td>
+        </tr>
+        <tr>
+            <td>Last name:</td>
+            <td><input value="@_student.LastName" disabled /></td>
+            <td rowspan="3"><img alt="@(_student.FirstName) @(_student.LastName) avatar" src="@_student.AvatarUrl" class="avatar" /></td>
+        </tr>
+        <tr>
+            <td>Birthday date:</td>
+            <td><input value="@_student.Birthdate" disabled /></td>
+        </tr>
+        <tr>
+            <td>Studies:</td>
+            <td><input value="@_student.Studies" disabled /></td>
+        </tr>
+    </table>
+}
+
+<br/>
+<button @onclick="Return">Return</button>
+
+@code {
+    /*Nasz parametr - nazwa musi się pokrywać się z tym co jest w @page*/
+    [Parameter]
+    public int Id { get; set; }
+
+    private Student? _student;
+    
+    /*Metoda incjalizująca
+     Działa trochę jak konstruktor dla komponentu */
+    protected override async Task OnInitializedAsync()
+    {
+        _student = StudentService.GetStudentById(Id);
+    }
+
+    private void Return()
+    {
+        NavigationManager.NavigateTo("/studenci");
+    }
+}

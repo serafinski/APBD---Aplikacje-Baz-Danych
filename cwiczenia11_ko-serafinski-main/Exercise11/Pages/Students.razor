@@ -1,0 +1,155 @@
+﻿@*Dodanie pola pod którym jest strona*@
+@page "/studenci"
+
+<PageTitle>Studenci</PageTitle>
+
+<h1>Studenci</h1>
+
+@*Dodane razem z wstrzyknięciem*@
+@using Exercise11.Data
+
+@*Wstrzyknięcie zależności*@
+@inject IStudentService StudentService
+
+@*Do przechodzenia po stronach!*@
+@inject NavigationManager NavigationManager
+
+@*Do JavaScript'a*@
+@inject IJSRuntime JsRuntime
+
+@*Sprawdzenie czy elementy zostały załadowane - jak nie to... *@
+@if (_students is null)
+{
+    /*... wyświetlamy informacje o ładowaniu - jako że robimy lokalnie to nigdy tego nie dostaniemy!*/
+    <div>Loading...</div>
+}
+else
+{
+@*Tworzenie tabelki*@
+    <table>
+        @* 1 element tabelki - nagłówek tabelki*@
+        <thead>
+        @*tr - rząd nagłówka*@
+        <tr>
+            @*th - nagłówek tabeli (jeden z)*@
+            <th>Avatar</th>
+            <th @onclick=@(() => Sort("FirstName"))>First Name</th>
+            <th @onclick=@(() => Sort("LastName"))>Last Name</th>
+            <th @onclick=@(() => Sort("Birthdate"))>Birthdate</th>
+            <th @onclick=@(() => Sort("Studies"))>Studies</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        @* 2 element tabelki - reszta tabelki *@
+        <tbody>
+        @*Iteracja po każdym elemencie w liście - by je wyświetlić*@
+        @foreach (var student in _students)
+        {
+            <tr>
+                @*td - w nich przechowujemy już konkretne dane*@
+                @*ustawienie obrazka jak normanie w HTML*@
+                <td><img src=@student.AvatarUrl alt="avatar"/></td>
+                <td>@student.FirstName</td>
+                <td>@student.LastName</td>
+                <td>@student.Birthdate</td>
+                <td>@student.Studies</td>
+                @*Trzeba było przestawić na oddzielny przycisk bo cały rząd psuł działanie aplikacji!*@
+                <td>
+                    <button @onclick=@(() => NavigateTo($"/studenci/{student.Id}"))>Show Details</button>
+                    <button @onclick=@(() => Remove(student.Id))>Delete</button>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+
+@code {
+    /*Lokalna lista elementów
+     Oznaczamy jako element nullowal'ny*/
+    private List<Student>? _students;
+    private Tuple<string, SortDireciton?> _currentSort;
+
+
+    /*Typy sortowania*/
+    enum SortDireciton
+    {
+        ASC,
+        DES
+    }
+    
+    /*Metody cyklu życia komponentu*/
+    
+    /*Metoda incjalizująca
+     Działa trochę jak konstruktor dla komponentu */
+    protected override async Task OnInitializedAsync()
+    {
+        _students = StudentService.GetStudents().ToList();
+        _currentSort = new Tuple<string, SortDireciton?>("", null);
+    }
+    
+    /*Nawigowanie do odpowiedniego ucznia strony*/
+    private void NavigateTo(string url)
+    {
+        NavigationManager.NavigateTo(url);
+    }
+    
+    /*Sortowanie tablicy*/
+    /*columnName musi się pokrywać z nazwą zdefiniowaną w modelu!*/
+    private void Sort(string columnName)
+    {
+        if (_students is not null)
+        {
+            /*Sprawdzenie czy kolumna którą chcemy sortować jest taka sama jak ta przez którą aktualnie sortujemy!*/
+            if (_currentSort.Item1 == columnName)
+            {
+                /*Jeżeli jest to odwracamy sortowanie*/
+                _currentSort = new Tuple<string, SortDireciton?>(columnName, _currentSort.Item2 == SortDireciton.ASC ? SortDireciton.DES : SortDireciton.ASC);
+            }
+            else
+            {
+                /*Jak nie jest to ustawiamy sortowanie na DES*/
+                _currentSort = new Tuple<string, SortDireciton?>(columnName, SortDireciton.DES);
+            }
+            
+            /*Samo sortowanie*/
+            switch (_currentSort.Item2)
+            {
+                /*Ustawiamy rosnąco*/
+                case SortDireciton.ASC:
+                    _students = _students.OrderBy(e => e.GetType().GetProperty(columnName)?.GetValue(e)).ToList();   
+                    break;
+                    
+                /*Ustawiamy malejąco*/
+                case SortDireciton.DES:
+                    _students = _students.OrderByDescending(e => e.GetType().GetProperty(columnName)?.GetValue(e)).ToList();   
+                    break;
+            }
+        }
+    }
+    
+    /*Metoda do usuwania studenta*/
+    private async Task Remove(int id)
+    {
+        //Usuwanie w bazie danych
+        // if (await Service.RemoveElementByID(id)
+        
+        //Usuwanie w lokalnej liście 
+        
+        /*Zwraca coś więc nie jest InvokeVoidAsync*/
+        /*Podajemy nazwę funkcji JS z której chcemy skorzystać a potem wiadomość*/
+        /*Jak tak - to usuwamy*/
+        if (await JsRuntime.InvokeAsync<bool>("confirm", "Czy chcesz usunąć ten element?"))
+        {
+            StudentService.RemoveStudentByID(id);
+
+            var studenToRemove = _students.FirstOrDefault(e => e.Id == id);
+        
+            if (studenToRemove != null)
+            {
+                _students.Remove(studenToRemove);
+            }
+        }
+    }
+}

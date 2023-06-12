@@ -1,0 +1,21 @@
+﻿/*Tabelka na całą szerokość strony*/
+table{
+    width: 100%;
+}
+
+/*Obramowanie dla tabelki*/
+/*Wycentrowanie nazw kolumn*/
+table,td, th{
+    border: 1px solid gray;
+    text-align: center;
+}
+
+/*Marginesy wewnętrzne*/
+td, th{
+    padding: 10px;
+}
+
+/*Zmniejszenie obrazka*/
+img{
+    width: 100px;
+}
